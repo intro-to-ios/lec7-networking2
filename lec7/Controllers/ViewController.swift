@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     // MARK: - Properties (view)
 
     private let addBarButton = UIBarButtonItem()
+    private let refreshControl = UIRefreshControl()
     private let tableView = UITableView()
 
     // MARK: - Properties (data)
@@ -46,7 +47,7 @@ class ViewController: UIViewController {
         }
     }
 
-    private func fetchRoster() {
+    @objc private func fetchRoster() {
         NetworkManager.shared.fetchRoster { [weak self] members in
             guard let self = self else { return }
             self.members = members
@@ -54,6 +55,7 @@ class ViewController: UIViewController {
             // Perform UI update on main queue
             DispatchQueue.main.async {
                 self.tableView.reloadData()
+                self.refreshControl.endRefreshing() // End refresh control
             }
         }
     }
@@ -64,6 +66,10 @@ class ViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(MemberTableViewCell.self, forCellReuseIdentifier: MemberTableViewCell.reuse)
+
+        // Add refresh control
+        refreshControl.addTarget(self, action: #selector(fetchRoster), for: .valueChanged)
+        tableView.refreshControl = refreshControl
 
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
