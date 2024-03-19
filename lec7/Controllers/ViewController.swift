@@ -16,7 +16,7 @@ class ViewController: UIViewController {
 
     // MARK: - Properties (data)
 
-    private var members = Member.dummyData
+    private var members: [Member] = []  // Set this to empty array since we are no longer using dummy data
 
     // MARK: - View Cycles
 
@@ -33,12 +33,25 @@ class ViewController: UIViewController {
         )
 
         setupTableView()
+        fetchRoster()
     }
 
     // MARK: - Networking
 
     @objc private func addNewMember() {
         // TODO: Send a POST request to add a new member
+    }
+
+    private func fetchRoster() {
+        NetworkManager.shared.fetchRoster { [weak self] members in
+            guard let self = self else { return }
+            self.members = members
+
+            // Perform UI update on main queue
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
 
     // MARK: - Set Up Views
