@@ -39,7 +39,11 @@ class ViewController: UIViewController {
     // MARK: - Networking
 
     @objc private func addNewMember() {
-        // TODO: Send a POST request to add a new member
+        let newbie = Member(name: "Caitlyn Jin", subteam: "iOS", position: "Member")
+
+        NetworkManager.shared.addToRoster(member: newbie) { member in
+            // Do something with the member if needed
+        }
     }
 
     private func fetchRoster() {

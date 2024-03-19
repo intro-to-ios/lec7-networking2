@@ -44,4 +44,41 @@ class NetworkManager {
             }
     }
 
+    /**
+     Add a new member to the roster
+
+     - Parameters:
+        - member: the member object to add
+     */
+    func addToRoster(member: Member, completion: @escaping (Member) -> Void) {
+        // Specify the endpoint
+        let endpoint = "https://ioscourse-g3jtiqqehq-ue.a.run.app/"
+
+        // Define the request body
+        let parameters: Parameters = [
+            "name": member.name,
+            "subteam": member.subteam,
+            "position": member.position
+        ]
+
+        // Create a decoder
+        let decoder = JSONDecoder()
+        // decoder.dateDecodingStrategy = .iso8601 // Only if needed
+        // decoder.keyDecodingStrategy = .convertFromSnakeCase // Only if needed
+
+        // Create the request
+        AF.request(endpoint, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+            .validate()
+            .responseDecodable(of: Member.self, decoder: decoder) { response in
+                // Handle the response
+                switch response.result {
+                case .success(let member):
+                    print("Successfully added member \(member.name)")
+                    completion(member)
+                case .failure(let error):
+                    print("Error in NetworkManager.addToRoster: \(error.localizedDescription)")
+                }
+            }
+    }
+
 }
